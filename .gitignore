@@ -222,3 +222,7 @@ CODE/database/128_fishing_trajs.csv
 
 # Local Python virtual environment
 CODE/AIS_venv/
+
+# opencode local configuration (agents, skills, briefs)
+.opencode/
+
