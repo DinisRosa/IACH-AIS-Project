@@ -206,9 +206,9 @@ emp\'irica sobre o valor do p\'os-processamento na robustez das dete\c{c}\~oes.
 
 O sistema ser\'a organizado num \emph{pipeline} de cinco etapas (Figura~\ref{fig:pipeline}). (1)~\emph{Ingest\~ao e
 pr\'e-processamento}: os dados do ficheiro CSV s\~ao importados, os \emph{outliers} e \emph{gaps} temporais s\~ao
-tratados e as caracter\'isticas normalizadas; caracter\'isticas derivadas (velocidade,
-acelera\c{c}\~ao, taxa de varia\c{c}\~ao de rumo e dist\^ancia \`a costa) s\~ao calculadas a
-partir das coordenadas e do tempo. (2)~\emph{Janelamento}: cada trajet\'oria \'e dividida em
+tratados e as caracter\'isticas normalizadas; caracter\'isticas derivadas (como a acelera\c{c}\~ao) s\~ao calculadas a partir das
+coordenadas e do tempo; a velocidade, o rumo, a varia\c{c}\~ao de rumo e a dist\^ancia \`a
+costa j\'a v\^em no dataset e n\~ao s\~ao recalculados. (2)~\emph{Janelamento}: cada trajet\'oria \'e dividida em
 janelas de comprimento fixo com sobreposi\c{c}\~ao, de modo a dar contexto local a cada
 ponto e a mitigar os efeitos de fronteira. (3)~\emph{Classifica\c{c}\~ao}: cada janela \'e
 classificada como pesca ou navega\c{c}\~ao por um modelo de aprendizagem profunda, cuja
