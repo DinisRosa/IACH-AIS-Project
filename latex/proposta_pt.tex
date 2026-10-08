@@ -97,8 +97,7 @@ O trabalho guia-se por três perguntas de investigação: (RQ1) em que medida as
 
 O sistema organiza-se num \emph{pipeline} de cinco etapas (Figura~\ref{fig:pipeline}). (1)~\emph{Ingestão e pré-processamento}: importação do CSV, tratamento de \emph{outliers} e \emph{gaps} temporais, normalização e cálculo de características derivadas (como a aceleração); velocidade, rumo, variação de rumo e distância à costa já vêm no \emph{dataset}. (2)~\emph{Janelamento}: divisão em janelas de comprimento fixo com sobreposição, dando contexto local a cada ponto e mitigando efeitos de fronteira. (3)~\emph{Classificação}: cada janela é classificada como pesca ou navegação por um modelo de aprendizagem profunda, cuja arquitetura (recorrente ou convolucional, possivelmente com atenção) será escolhida empiricamente, na linha de~\cite{cheng2025,wang2026}. (4)~\emph{Pós-processamento temporal}: as predições das janelas sobrepostas são agregadas (por exemplo, votação ponderada) e suavizadas (por exemplo, via HMM ou votação por vizinhança), produzindo segmentos contíguos e estáveis. (5)~\emph{Saída e explicabilidade}: trajetória segmentada com confiança por segmento e justificações (importâncias de características) que apoiam --- e não substituem --- o inspetor. A implementação usa Python, PyTorch, scikit-learn e pandas.
 
-\begin{figure}[t]
-\centering
+\begin{center}
 \begin{tikzpicture}[font=\scriptsize, >={Stealth[length=4pt]},
   box/.style={draw, rounded corners, align=center, minimum height=0.8cm, minimum width=2.2cm, text width=2.0cm}]
 \node[box] (a) at (0,0) {Trajetória AIS};
@@ -115,9 +114,9 @@ O sistema organiza-se num \emph{pipeline} de cinco etapas (Figura~\ref{fig:pipel
 \draw[->] (e) -- (f);
 \draw[->] (f) -- (g);
 \end{tikzpicture}
-\caption{Esquema do \emph{pipeline} proposto.}
+\captionof{figure}{Esquema do \emph{pipeline} proposto.}
 \label{fig:pipeline}
-\end{figure}
+\end{center}
 
 \section{Materiais e Dados}
 \label{sec:materiais-dados}
