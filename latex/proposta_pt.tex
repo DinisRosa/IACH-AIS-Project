@@ -60,192 +60,60 @@
 \maketitle
 
 \begin{abstract}
-A pesca ilegal, n\~ao declarada e n\~ao regulamentada (IUU) \'e uma das maiores
-amea\c{c}as \`a sustentabilidade dos oceanos. O \emph{Automatic Identification
-System} (AIS) permite monitorizar a atividade dos navios \`a escala global, mas
-transformar trajet\'orias AIS em dete\c{c}\~oes \'uteis para a fiscaliza\c{c}\~ao
-exige m\'etodos robustos e interpret\'aveis. Propomos investigar se a combina\c{c}\~ao de janelas sobrepostas e
-p\'os-processamento temporal melhora a qualidade e a estabilidade da segmenta\c{c}\~ao
-sem\^antica de trajet\'orias AIS para detetar atividade de pesca, como apoio \`a
-decis\~ao de inspetores humanos (\emph{human-in-the-loop}). O sistema segue princ\'ipios
-da Intelig\^encia Artificial Centrada no Humano (HCAI), incorporando explicabilidade,
-confian\c{c}a calibrada e decis\~ao humana final.
-A abordagem ser\'a avaliada sobre um conjunto p\'ublico de 128 trajet\'orias de pesca
-anotadas (Kaggle), comparando com \emph{baselines} como um \emph{Hidden Markov Model} e
-a segmenta\c{c}\~ao sem\^antica de Wu et al.~\cite{wu2022}, atrav\'es de m\'etricas como
-precis\~ao, sensibilidade, F1 e \emph{intersection-over-union}, complementadas por
-an\'alise qualitativa.
+A pesca ilegal, não declarada e não regulamentada (IUU) ameaça a sustentabilidade dos oceanos. O \emph{Automatic Identification System} (AIS) permite monitorizar navios à escala global, mas converter trajetórias em deteções úteis à fiscalização exige métodos robustos e interpretáveis. Propomos investigar se a combinação de janelas sobrepostas e pós-processamento temporal melhora a qualidade e a estabilidade da segmentação semântica de trajetórias AIS para detetar pesca, como apoio à decisão de inspetores humanos (\emph{human-in-the-loop}), segundo princípios de Inteligência Artificial Centrada no Humano (HCAI): explicabilidade, confiança calibrada e decisão humana final. A avaliação usa 128 trajetórias anotadas (Kaggle), comparando com um \emph{Hidden Markov Model} (HMM) e com Wu et al.~\cite{wu2022} através de precisão, sensibilidade, F1 e \emph{intersection-over-union} (IoU), complementadas por análise qualitativa.
 \end{abstract}
 
-\section{Problema e Motiva\c{c}\~ao}
+\section{Problema e Motivação}
 \label{sec:problema-motivacao}
 
-A pesca ilegal, n\~ao declarada e n\~ao regulamentada (IUU) \'e uma das principais
-amea\c{c}as \`a sustentabilidade dos oceanos: estima-se que represente at\'e cerca de
-20\% da captura mundial de pescado~\cite{agnew2009}, com perdas econ\'omicas na ordem das dezenas de
-milhares de milh\~oes de d\'olares por ano, al\'em de agravar a sobre-explora\c{c}\~ao
-dos \emph{stocks}, degradar habitats e estar associada a condi\c{c}\~oes de trabalho
-ilegais~\cite{chuaysi2020}. Combater este fen\'omeno exige saber onde, quando e quais os
-navios que est\~ao efetivamente a pescar --- uma tarefa imposs\'ivel de realizar apenas
-por inspe\c{c}\~ao humana, dada a escala da frota mundial e o volume de dados de
-tr\'afego mar\'itimo.
+A pesca IUU representa até cerca de 20\% da captura mundial~\cite{agnew2009}, com perdas de dezenas de milhares de milhões de dólares por ano, sobre-exploração dos \emph{stocks}, degradação de habitats e condições de trabalho ilegais~\cite{chuaysi2020}. Combatê-la exige saber onde, quando e quais os navios que estão a pescar --- impossível apenas por inspeção humana, dada a escala da frota e do tráfego marítimo. O AIS transmite posição, rumo e velocidade a cada poucos segundos, sendo a principal fonte para monitorizar a pesca à escala global~\cite{natale2015,kroodsma2018}. Os padrões de movimento da pesca --- velocidades reduzidas, mudanças de rumo frequentes e zigue-zague --- distinguem-na da navegação em trânsito. O problema é, assim, \textbf{classificar automaticamente, ao longo de uma trajetória AIS, os intervalos de pesca versus navegação}, de forma robusta e interpretável.
 
-O AIS transmite, em intervalos de poucos segundos, a posi\c{c}\~ao, o rumo e a
-velocidade de cada navio, tornando-se a principal fonte de dados para monitorizar a
-atividade piscat\'oria \`a escala global~\cite{natale2015,kroodsma2018}. A partir destas
-trajet\'orias \'e poss\'ivel inferir os padr\~oes de movimento caracter\'isticos da
-pesca --- velocidades reduzidas, mudan\c{c}as de rumo frequentes e deslocamentos em
-ziguezague --- distinguindo-os dos da navega\c{c}\~ao em tr\^ansito. O problema que este
-projeto aborda \'e, assim, o de \textbf{classificar automaticamente, ao longo de uma
-trajet\'oria AIS, os intervalos temporais correspondentes a atividade de pesca versus
-navega\c{c}\~ao}, de forma robusta e interpret\'avel.
-
-A motiva\c{c}\~ao \'e dupla. Por um lado, t\'ecnica: os modelos atuais de
-segmenta\c{c}\~ao de trajet\'orias tendem a produzir segmenta\c{c}\~oes ruidosas e
-sens\'iveis a pequenas perturba\c{c}\~oes, que podem ganhar consist\^encia com janelas
-sobrepostas e p\'os-processamento temporal. Por outro, humana: este sistema destina-se a apoiar
-agentes de fiscaliza\c{c}\~ao e autoridades de gest\~ao das pescas, pelo que deve ser
-\textbf{fi\'avel, explic\'avel e concebido para coopera\c{c}\~ao humano-IA} ---
-apresentando as suas decis\~oes de forma transparente e deixando a decis\~ao final a um
-inspetor humano. O projeto enquadra-se assim na \'area da Intelig\^encia Artificial
-Centrada no Humano (HCAI), em particular nos t\'opicos da coopera\c{c}\~ao humano-IA e da
-IA fi\'avel e respons\'avel.
+A motivação é dupla. Tecnicamente, os modelos atuais de segmentação produzem resultados ruidosos e sensíveis a pequenas perturbações, que podem ganhar consistência com janelas sobrepostas e pós-processamento temporal. Do lado humano, o sistema destina-se a apoiar agentes de fiscalização e autoridades de gestão das pescas, pelo que deve ser \textbf{fiável, explicável e concebido para cooperação humano-IA}, deixando a decisão final ao inspetor. O projeto enquadra-se na HCAI, em particular na cooperação humano-IA e na IA fiável e responsável.
 
 \section{Contexto}
 \label{sec:contexto}
 
-Os primeiros trabalhos de identifica\c{c}\~ao autom\'atica de atividade de pesca
-basearam-se em m\'etodos probabil\'isticos sobre dados de \emph{Vessel Monitoring
-System} (VMS). Peel e Good~\cite{peel2011} e Vermard et al.~\cite{vermard2010}
-propuseram \emph{hidden Markov models} (HMM) para distinguir estados de pesca e de
-navega\c{c}\~ao a partir de s\'eries temporais de posi\c{c}\~oes. A ado\c{c}\~ao
-generalizada do AIS alargou a escala desta monitoriza\c{c}\~ao. Natale et
-al.~\cite{natale2015} mapearam o esfor\c{c}o de pesca europeu a partir de AIS, e
-Kroodsma et al.~\cite{kroodsma2018} constru\'iram um mapa global da pegada da pesca
-comercial.
+Os primeiros métodos de identificação de pesca usaram modelos probabilísticos sobre dados \emph{Vessel Monitoring System} (VMS): Peel e Good~\cite{peel2011} e Vermard et al.~\cite{vermard2010} propuseram HMM para distinguir estados de pesca e navegação. O AIS alargou a escala --- Natale et al.~\cite{natale2015} mapearam o esforço de pesca europeu e Kroodsma et al.~\cite{kroodsma2018} a pegada global. Mais recentemente, a segmentação semântica de trajetórias emergiu como formalismo adequado: divide-se a trajetória em segmentos homogéneos com significado, em vez de classificar pontos isolados. Soares Júnior et al.~\cite{soares2018} propuseram uma abordagem semi-supervisionada baseada em \emph{Minimum Description Length}, e Wu et al.~\cite{wu2022} aplicaram-na a trajetórias AIS para detetar atividades de pesca completas --- a referência central deste projeto. Em paralelo, dominam métodos de aprendizagem profunda: redes com atenção~\cite{cheng2025}, aprendizagem espaço-temporal local-global (FishFormer)~\cite{wang2026}, campos de Gram~\cite{hu2026} e métodos geométricos semi-supervisionados~\cite{ferreira2022}. Quanto à dimensão humana, a HCAI~\cite{shneiderman2020} defende sistemas fiáveis e explicáveis que apoiem a decisão humana em vez de a substituírem.
 
-Mais recentemente, a segmenta\c{c}\~ao sem\^antica de trajet\'orias emergiu como
-formalismo adequado ao problema: em vez de classificar pontos isolados, divide-se a
-trajet\'oria em segmentos homog\'eneos dotados de significado. Soares J\'unior et
-al.~\cite{soares2018} propuseram uma abordagem semi-supervisionada baseada no princ\'ipio
-\emph{Minimum Description Length}, e Wu et al.~\cite{wu2022} aplicaram a
-segmenta\c{c}\~ao sem\^antica a trajet\'orias AIS para detetar atividades de pesca
-completas --- a refer\^encia central deste projeto. Em paralelo, os m\'etodos de
-aprendizagem profunda t\^em vindo a dominar a \'area: redes com aten\c{c}\~ao para a
-classifica\c{c}\~ao de navios~\cite{cheng2025}, aprendizagem espa\c{c}o-temporal
-local-global (FishFormer)~\cite{wang2026}, campos de Gram (\emph{Gramian Angular
-Field}) para reconhecimento de padr\~oes~\cite{hu2026} e m\'etodos geom\'etricos
-semi-supervisionados~\cite{ferreira2022}. Complementarmente, a literatura cobre a
-identifica\c{c}\~ao de comportamento e a rastreabilidade no combate \`a pesca
-IUU~\cite{chuaysi2020}, a dete\c{c}\~ao de atividade em dados AIS
-longitudinais~\cite{arasteh2020}, a classifica\c{c}\~ao de
-trajet\'orias~\cite{luo2023,xing2023} e compara\c{c}\~oes sistem\'aticas de m\'etodos
-sobre VMS~\cite{guillot2018,ghazizadeh2019}.
- No que respeita \`a dimens\~ao humana, a IA Centrada no Humano (HCAI)~\cite{shneiderman2020}
- defende sistemas fi\'aveis e explic\'aveis que apoiem a decis\~ao humana em vez de a
- substitu\'irem.
-
-Apesar destes avan\c{c}os, subsistem limita\c{c}\~oes que motivam o projeto. Em primeiro
-lugar, as predi\c{c}\~oes ponto-a-ponto tendem a ser ruidosas e a produzir fronteiras de
-segmento inst\'aveis. Este projeto prop\~oe combinar janelas sobrepostas com
-p\'os-processamento temporal para suavizar e estabilizar essas fronteiras, e avaliar
-explicitamente o efeito dessa combina\c{c}\~ao na estabilidade dos segmentos. Em segundo
-lugar, a dimens\~ao humana \'e frequentemente secundarizada: para uso real em
-fiscaliza\c{c}\~ao, o sistema deve ser explic\'avel e cooperar com o inspetor, e n\~ao
-atuar como uma ``caixa preta'' inquestion\'avel. Face a Wu et al.~\cite{wu2022}, que
-detetam atividades de pesca completas por segmenta\c{c}\~ao sem\^antica, este projeto
-acrescenta a avalia\c{c}\~ao da estabilidade temporal obtida com as janelas sobrepostas e
-o p\'os-processamento, bem como a perspetiva de coopera\c{c}\~ao humano-IA. \'E nestas
-duas dimens\~oes --- robustez temporal e centralidade humana --- que o projeto se
-posiciona.
+Subsistem, porém, duas limitações. Primeiro, as predições ponto-a-ponto são ruidosas e geram fronteiras de segmento instáveis; propomos combinar janelas sobrepostas com pós-processamento temporal para as estabilizar e avaliar explicitamente esse efeito. Segundo, a dimensão humana é frequentemente secundarizada: em fiscalização real o sistema deve ser explicável e cooperar com o inspetor, não atuar como ``caixa preta''. Face a Wu et al.~\cite{wu2022}, o projeto acrescenta a avaliação da estabilidade temporal e a perspetiva de cooperação humano-IA; é nestas duas dimensões --- robustez temporal e centralidade humana --- que se posiciona.
 
 \section{Objetivos}
 \label{sec:objetivos}
 
-O objetivo principal \'e desenvolver um sistema de segmenta\c{c}\~ao sem\^antica de
-trajet\'orias AIS que detete atividade de pesca de forma robusta e interpret\'avel,
-combinando \textbf{janelas sobrepostas} e \textbf{p\'os-processamento temporal}, e
-concebido como \textbf{apoio \`a decis\~ao de inspetores} (\emph{human-in-the-loop}).
-Deste objetivo decorrem os seguintes objetivos espec\'ificos:
+O objetivo principal é desenvolver um sistema de segmentação semântica de trajetórias AIS que detete pesca de forma robusta e interpretável, combinando \textbf{janelas sobrepostas} e \textbf{pós-processamento temporal}, como \textbf{apoio à decisão de inspetores} (\emph{human-in-the-loop}). Os objetivos específicos são:
 
 \begin{enumerate}
-    \item Construir um \emph{pipeline} de pr\'e-processamento do conjunto de dados AIS
-    (limpeza, normaliza\c{c}\~ao, engenharia de caracter\'isticas e janelamento com
-    sobreposi\c{c}\~ao).
-    \item Implementar e treinar um modelo de classifica\c{c}\~ao de janelas (por exemplo,
-     redes recorrentes ou convolucionais com aten\c{c}\~ao), usando a segmenta\c{c}\~ao de
-     Wu et al.~\cite{wu2022} e/ou um HMM~\cite{peel2011} como \emph{baselines}.
-    \item Conceber e avaliar um p\'os-processamento temporal que combine as predi\c{c}\~oes
-    das janelas sobrepostas e regularize as fronteiras dos segmentos.
-    \item Avaliar o sistema quantitativamente (m\'etricas por segmento e por ponto) e
-    qualitativamente (visualiza\c{c}\~ao e casos de estudo).
-    \item Dotar o sistema de elementos de explicabilidade (por exemplo, atribui\c{c}\~oes de
-    import\^ancia~\cite{lundberg2017} e confian\c{c}a calibrada~\cite{guo2017}) que sustentem a
-    decis\~ao do inspetor.
+    \item Construir um \emph{pipeline} de pré-processamento (limpeza, normalização, engenharia de características e janelamento com sobreposição).
+    \item Implementar e treinar um classificador de janelas (por exemplo, redes recorrentes ou convolucionais com atenção), com Wu et al.~\cite{wu2022} e um HMM~\cite{peel2011} como \emph{baselines}.
+    \item Conceber e avaliar um pós-processamento temporal que combine as predições das janelas sobrepostas e regularize as fronteiras dos segmentos.
+    \item Avaliar quantitativamente (por segmento e por ponto) e qualitativamente (visualização e casos de estudo).
+    \item Incluir explicabilidade (atribuições de importância~\cite{lundberg2017}) e confiança calibrada~\cite{guo2017} que sustentem a decisão do inspetor.
 \end{enumerate}
 
-De forma mais precisa, o trabalho guia-se por tr\^es perguntas de investiga\c{c}\~ao:
-(RQ1) em que medida as janelas sobrepostas reduzem a instabilidade das fronteiras da
-segmenta\c{c}\~ao relativamente a janelas n\~ao sobrepostas? (RQ2) em que medida o
-p\'os-processamento temporal reduz a fragmenta\c{c}\~ao e melhora a concord\^ancia entre
-os segmentos previstos e os anotados? (RQ3) qual a intera\c{c}\~ao entre sobreposi\c{c}\~ao
-e p\'os-processamento na qualidade e estabilidade da segmenta\c{c}\~ao?
-
-Considera-se o trabalho bem-sucedido se (i) caracterizar quantitativamente o efeito das
-janelas sobrepostas e do p\'os-processamento na qualidade e estabilidade da
-segmenta\c{c}\~ao, procurando melhor\'a-las face aos \emph{baselines} --- aceitando como
-resultado v\'alido a demonstra\c{c}\~ao de que uma componente n\~ao traz ganho ---, (ii)
-produzir segmenta\c{c}\~oes temporalmente est\'aveis e (iii) fornecer justifica\c{c}\~oes
-audit\'aveis que permitam a um inspetor humano validar as dete\c{c}\~oes. As contribui\c{c}\~oes esperadas s\~ao: um m\'etodo de janelas sobrepostas
-com p\'os-processamento temporal para a dete\c{c}\~ao de pesca; uma avalia\c{c}\~ao que
-integre a perspetiva HCAI (explicabilidade e coopera\c{c}\~ao humano-IA); e evid\^encia
-emp\'irica sobre o valor do p\'os-processamento na robustez das dete\c{c}\~oes.
+O trabalho guia-se por três perguntas de investigação: (RQ1) em que medida as janelas sobrepostas reduzem a instabilidade das fronteiras face a janelas não sobrepostas? (RQ2) em que medida o pós-processamento reduz a fragmentação e melhora a concordância com os segmentos anotados? (RQ3) qual a interação entre sobreposição e pós-processamento? Será bem-sucedido se (i) caracterizar quantitativamente o efeito de ambas as componentes face aos \emph{baselines} --- aceitando como resultado válido a demonstração de que uma componente não traz ganho ---, (ii) produzir segmentações temporalmente estáveis e (iii) fornecer justificações auditáveis para validação por um inspetor. Contribuições esperadas: um método de janelas sobrepostas com pós-processamento temporal para deteção de pesca, uma avaliação que integra a perspetiva HCAI e evidência empírica sobre o valor do pós-processamento.
 
 \section{Abordagem}
 \label{sec:abordagem}
 
-O sistema ser\'a organizado num \emph{pipeline} de cinco etapas (Figura~\ref{fig:pipeline}). (1)~\emph{Ingest\~ao e
-pr\'e-processamento}: os dados do ficheiro CSV s\~ao importados, os \emph{outliers} e \emph{gaps} temporais s\~ao
-tratados e as caracter\'isticas normalizadas; caracter\'isticas derivadas (como a acelera\c{c}\~ao) s\~ao calculadas a partir das
-coordenadas e do tempo; a velocidade, o rumo, a varia\c{c}\~ao de rumo e a dist\^ancia \`a
-costa j\'a v\^em no dataset e n\~ao s\~ao recalculados. (2)~\emph{Janelamento}: cada trajet\'oria \'e dividida em
-janelas de comprimento fixo com sobreposi\c{c}\~ao, de modo a dar contexto local a cada
-ponto e a mitigar os efeitos de fronteira. (3)~\emph{Classifica\c{c}\~ao}: cada janela \'e
-classificada como pesca ou navega\c{c}\~ao por um modelo de aprendizagem profunda, cuja
-arquitetura (recorrente ou convolucional, possivelmente com aten\c{c}\~ao) ser\'a selecionada
-empiricamente no protocolo experimental, na linha de~\cite{cheng2025,wang2026}. (4)~\emph{P\'os-processamento temporal}: as
-predi\c{c}\~oes das janelas sobrepostas s\~ao agregadas (por exemplo, por vota\c{c}\~ao
-ponderada) e suavizadas com regulariza\c{c}\~ao temporal (por exemplo, uma suaviza\c{c}\~ao
-via HMM ou vota\c{c}\~ao por vizinhan\c{c}a), produzindo segmentos cont\'iguos e
-est\'aveis. (5)~\emph{Sa\'ida e explicabilidade}: o sistema devolve a trajet\'oria
-segmentada com um n\'ivel de confian\c{c}a por segmento e justifica\c{c}\~oes
-(import\^ancias de caracter\'isticas), apresentadas de forma a apoiar --- e n\~ao substituir
---- a decis\~ao do inspetor.
-
-A implementa\c{c}\~ao utilizar\'a Python e o ecossistema PyTorch, scikit-learn e pandas,
-num ambiente virtual dedicado. Como
-\emph{baselines} ser\~ao usados um HMM~\cite{peel2011} e a segmenta\c{c}\~ao sem\^antica
-de~\cite{wu2022}. As principais decis\~oes de desenho s\~ao: (i) janelas sobrepostas para
-capturar contexto sem perder resolu\c{c}\~ao temporal; (ii) p\'os-processamento temporal para
-garantir consist\^encia e estabilidade; e (iii) um canal de explicabilidade que torne cada
-dete\c{c}\~ao audit\'avel por um humano.
+O sistema organiza-se num \emph{pipeline} de cinco etapas (Figura~\ref{fig:pipeline}). (1)~\emph{Ingestão e pré-processamento}: importação do CSV, tratamento de \emph{outliers} e \emph{gaps} temporais, normalização e cálculo de características derivadas (como a aceleração); velocidade, rumo, variação de rumo e distância à costa já vêm no \emph{dataset}. (2)~\emph{Janelamento}: divisão em janelas de comprimento fixo com sobreposição, dando contexto local a cada ponto e mitigando efeitos de fronteira. (3)~\emph{Classificação}: cada janela é classificada como pesca ou navegação por um modelo de aprendizagem profunda, cuja arquitetura (recorrente ou convolucional, possivelmente com atenção) será escolhida empiricamente, na linha de~\cite{cheng2025,wang2026}. (4)~\emph{Pós-processamento temporal}: as predições das janelas sobrepostas são agregadas (por exemplo, votação ponderada) e suavizadas (por exemplo, via HMM ou votação por vizinhança), produzindo segmentos contíguos e estáveis. (5)~\emph{Saída e explicabilidade}: trajetória segmentada com confiança por segmento e justificações (importâncias de características) que apoiam --- e não substituem --- o inspetor. A implementação usa Python, PyTorch, scikit-learn e pandas.
 
 \begin{figure}[t]
 \centering
-\begin{tikzpicture}[node distance=0.55cm, box/.style={draw, rounded corners, align=center, minimum height=0.7cm, font=\small}]
-\node[box] (a) {Trajet\'oria AIS};
-\node[box, below=of a] (b) {Pr\'e-processamento};
-\node[box, below=of b] (c) {Janelas sobrepostas};
-\node[box, below=of c] (d) {Classifica\c{c}\~ao das janelas};
-\node[box, below=of d] (e) {P\'os-processamento temporal};
-\node[box, below=of e] (f) {Segmentos sem\^anticos};
-\node[box, below=of f] (g) {Explicabilidade / decis\~ao humana};
-\draw[-{Stealth}] (a) -- (b);
-\draw[-{Stealth}] (b) -- (c);
-\draw[-{Stealth}] (c) -- (d);
-\draw[-{Stealth}] (d) -- (e);
-\draw[-{Stealth}] (e) -- (f);
-\draw[-{Stealth}] (f) -- (g);
+\begin{tikzpicture}[font=\scriptsize, >={Stealth[length=4pt]},
+  box/.style={draw, rounded corners, align=center, minimum height=0.8cm, minimum width=2.2cm, text width=2.0cm}]
+\node[box] (a) at (0,0) {Trajetória AIS};
+\node[box] (b) at (2.9,0) {Pré-processamento};
+\node[box] (c) at (5.8,0) {Janelas sobrepostas};
+\node[box] (d) at (0,-1.5) {Classificação das janelas};
+\node[box] (e) at (2.9,-1.5) {Pós-processamento temporal};
+\node[box] (f) at (5.8,-1.5) {Segmentos semânticos};
+\node[box] (g) at (5.8,-3.0) {Explicabilidade / decisão humana};
+\draw[->] (a) -- (b);
+\draw[->] (b) -- (c);
+\draw[->] (c.south) -- ++(0,-0.35) -| (d.north);
+\draw[->] (d) -- (e);
+\draw[->] (e) -- (f);
+\draw[->] (f) -- (g);
 \end{tikzpicture}
 \caption{Esquema do \emph{pipeline} proposto.}
 \label{fig:pipeline}
@@ -254,59 +122,14 @@ dete\c{c}\~ao audit\'avel por um humano.
 \section{Materiais e Dados}
 \label{sec:materiais-dados}
 
-Ser\'a usado o conjunto de dados p\'ublico \emph{Detailed Labelled Fishing Trajectories
-from AIS} (Kaggle)~\cite{kaggleAIS}, que cont\'em 128 trajet\'orias de pesca anotadas, totalizando cerca de
-1,03 milh\~oes de pontos. Cada ponto tem 13 atributos --- entre os quais o identificador do navio, o instante
-temporal, a posi\c{c}\~ao (longitude e latitude), a velocidade, o rumo e a dist\^ancia \`a
-costa --- e um r\'otulo. Os r\'otulos,
-desequilibrados, distinguem cinco classes: pesca (\texttt{02-fishing},
-\texttt{04-fishing}) e navega\c{c}\~ao (\texttt{01-sailing}, \texttt{03-sailing},
-\texttt{05-sailing}). Como o objetivo \'e exclusivamente distinguir atividade de pesca de
-navega\c{c}\~ao, as cinco classes s\~ao agregadas num problema bin\'ario (pesca vs.
-navega\c{c}\~ao); o desequil\'ibrio natural entre as classes \'e mantido (sem reamostragem
-nem pesos de classe), preservando as trajet\'orias completas.
+Será usado o conjunto público \emph{Detailed Labelled Fishing Trajectories from AIS} (Kaggle)~\cite{kaggleAIS}: 128 trajetórias de pesca anotadas, cerca de 1,03 milhões de pontos, 13 atributos por ponto (identificador do navio, instante, longitude, latitude, velocidade, rumo, distância à costa, entre outros) e um rótulo. As cinco classes, desequilibradas (pesca: \texttt{02-}, \texttt{04-fishing}; navegação: \texttt{01-}, \texttt{03-}, \texttt{05-sailing}), são agregadas num problema binário, mantendo o desequilíbrio natural (sem reamostragem nem pesos de classe) e as trajetórias completas. Eticamente, apesar de públicos, o uso de dados AIS em fiscalização exige cuidado: a deteção automática não deve, por si só, fundamentar sanções (a decisão humana é obrigatória); o sistema deve ser transparente e justo, evitando enviesamentos contra tipos de navio, regiões ou comunidades de pesca; e a confiança deve ser calibrada para não induzir falsa segurança.
 
-As ferramentas incluem Python 3.14, o ambiente virtual do reposit\'orio, PyTorch,
-scikit-learn, pandas e bibliotecas de visualiza\c{c}\~ao (matplotlib, geopandas). Quanto a
-considera\c{c}\~oes \'eticas, os dados AIS s\~ao p\'ublicos, mas o uso do sistema em
-fiscaliza\c{c}\~ao tem implica\c{c}\~oes que exigem cuidado: a dete\c{c}\~ao autom\'atica
-n\~ao deve, por si s\'o, fundamentar san\c{c}\~oes (a decis\~ao humana \'e
-obrigat\'oria); o sistema deve ser transparente e justo, evitando enviesamentos
-sistem\'aticos contra determinados tipos de navio, regi\~oes ou comunidades de pesca; e a
-confian\c{c}a deve ser calibrada para n\~ao induzir falsa seguran\c{c}a no inspetor.
-
-\section{Avalia\c{c}\~ao}
+\section{Avaliação}
 \label{sec:avaliacao}
 
-A avalia\c{c}\~ao ter\'a uma componente quantitativa e outra qualitativa.
-Quantitativamente, o desempenho ser\'a medido por precis\~ao, sensibilidade (\emph{recall}),
-F1 e \emph{intersection-over-union} (IoU) por segmento, comparando o sistema proposto com
-os \emph{baselines} (HMM~\cite{peel2011} e Wu et al.~\cite{wu2022}). Para isolar a contribui\c{c}\~ao de cada
-componente, ser\'a feito um estudo de abla\c{c}\~ao com quatro variantes: (i) sem
-sobreposi\c{c}\~ao e sem p\'os-processamento; (ii) s\'o com sobreposi\c{c}\~ao; (iii) s\'o com
-p\'os-processamento; e (iv) com sobreposi\c{c}\~ao e p\'os-processamento (m\'etodo proposto).
-Ser\'a ainda analisada a robustez em fun\c{c}\~ao da taxa de sobreposi\c{c}\~ao (por exemplo,
-0\%, 25\%, 50\% e 75\%) e do n\'ivel de regulariza\c{c}\~ao temporal. Al\'em das m\'etricas por
-segmento e por ponto, medir-se-\'a a estabilidade da segmenta\c{c}\~ao atrav\'es da
-fragmenta\c{c}\~ao (n\'umero de segmentos por trajet\'oria) e do erro de fronteira (desvio entre
-o in\'icio/fim previsto e o real), entendendo por ``est\'avel'' uma segmenta\c{c}\~ao que muda
-pouco sob pequenas altera\c{c}\~oes da janela ou do p\'os-processamento.
+Quantitativamente, medem-se precisão, sensibilidade, F1 e IoU por segmento (e por ponto), comparando com os \emph{baselines} (HMM~\cite{peel2011} e Wu et al.~\cite{wu2022}). Um estudo de ablação com quatro variantes isola cada componente: (i) sem sobreposição nem pós-processamento; (ii) só sobreposição; (iii) só pós-processamento; (iv) ambos (método proposto). Analisa-se também a robustez face à taxa de sobreposição (0\%, 25\%, 50\%, 75\%) e ao nível de regularização temporal. A estabilidade mede-se pela fragmentação (número de segmentos por trajetória) e pelo erro de fronteira (desvio entre início/fim previsto e real); ``estável'' designa uma segmentação que muda pouco sob pequenas alterações da janela ou do pós-processamento.
 
-Os dados ser\~ao divididos de forma agrupada por navio em treino/valida\c{c}\~ao/teste
-(70/15/15), garantindo que todas as trajet\'orias de um navio ficam no mesmo conjunto e
-evitando fuga de informa\c{c}\~ao; os hiperpar\^ametros ser\~ao escolhidos apenas com treino
-e valida\c{c}\~ao. Qualitativamente, ser\~ao produzidos mapas e gr\'aficos das trajet\'orias
-com os segmentos preditos sobrepostos \`a verdade de refer\^encia, e analisados casos de
-estudo de sucesso e de falha. Para a dimens\~ao HCAI, avaliar-se-\'a, de forma preliminar, a
-explicabilidade das dete\c{c}\~oes (por exemplo, verificando se as atribui\c{c}\~oes de
-import\^ancia~\cite{lundberg2017} correspondem aos padr\~oes de movimento esperados) e a
-utilidade do sistema como apoio \`a decis\~ao, atrav\'es de uma prova de conceito visual
-(\emph{dashboard}) que apresente a segmenta\c{c}\~ao, a confian\c{c}a por segmento e as
-justifica\c{c}\~oes a um inspetor. O sistema segue princ\'ipios de IA centrada no
-humano~\cite{shneiderman2020}, com confian\c{c}a calibrada~\cite{guo2017} e decis\~ao humana
-final. Os resultados esperados incluem tabelas de m\'etricas, matrizes de confus\~ao, curvas
-de robustez em fun\c{c}\~ao da sobreposi\c{c}\~ao e do p\'os-processamento, e
-visualiza\c{c}\~oes de trajet\'orias.
+Os dados são divididos por navio em treino/validação/teste (70/15/15), mantendo todas as trajetórias de um navio no mesmo conjunto para evitar fuga de informação; os hiperparâmetros usam apenas treino e validação. Qualitativamente, produzem-se mapas das trajetórias com os segmentos preditos sobrepostos à verdade de referência, e analisam-se casos de sucesso e falha. Para a dimensão HCAI~\cite{shneiderman2020}, avalia-se de forma preliminar a explicabilidade (verificando se as atribuições~\cite{lundberg2017} correspondem aos padrões de movimento esperados) e a utilidade como apoio à decisão, através de um \emph{dashboard} de prova de conceito com segmentação, confiança calibrada~\cite{guo2017} e justificações.
 
 % References may use the provided IJCAI named bibliography style.
 \bibliographystyle{../FormattingGuidelines-IJCAI-ECAI-26/named}
