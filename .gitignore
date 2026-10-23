@@ -218,7 +218,11 @@ __marimo__/
 .streamlit/secrets.toml
 
 # Local project data larger than GitHub's regular file-size limit
-CODE/database/128_fishing_trajs.csv
+CODE/database/full/128_fishing_trajs.csv
+CODE/database/full/128_fishing_trajs.json
+CODE/database/full/128_fishing_trajs_ordered_by_id.json
+CODE/database/partial/small_fishing_trajs.json
+CODE/database/partial/small_fishing_trajs_ordered_by_id.json
 
 # Local Python virtual environment
 CODE/AIS_venv/
