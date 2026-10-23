@@ -230,6 +230,8 @@ CODE/AIS_venv/
 # opencode local configuration (agents, skills, briefs)
 .opencode/
 
+.vscode/
+
 # Planning and review notes (not for version control)
 docs/
 
