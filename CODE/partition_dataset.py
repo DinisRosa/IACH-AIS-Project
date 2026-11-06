@@ -1,16 +1,6 @@
-# cria uma função que recebe um csv e 3 valores, percentagem de treino, de validação e de teste, tem de dar 100% no final.
-# Deves ter em consideração que uma linha do csv equivale a um instante, logo todos os instantes relativos a um id devem estar juntos; percebeste?
 import csv, json
 
-ALL_TRAJS = True
-if not ALL_TRAJS:
-    INPUT_CSV_FILE_PATH = "/home/dinisrosa22/Documentos/UNI/UC/MIACD/IA CENTRADA NO HUMANO/TRABALHO PROJETO/CODE/database/partial/small_fishing_trajs.csv"
-    INPUT_JSON_FILE_PATH = "/home/dinisrosa22/Documentos/UNI/UC/MIACD/IA CENTRADA NO HUMANO/TRABALHO PROJETO/CODE/database/partial/small_fishing_trajs.json"
-    OUTPUT_JSON_FILE_PATH = "/home/dinisrosa22/Documentos/UNI/UC/MIACD/IA CENTRADA NO HUMANO/TRABALHO PROJETO/CODE/database/partial/small_fishing_trajs_ordered_by_id.json"
-else:
-    INPUT_CSV_FILE_PATH = "/home/dinisrosa22/Documentos/UNI/UC/MIACD/IA CENTRADA NO HUMANO/TRABALHO PROJETO/CODE/database/full/128_fishing_trajs.csv"
-    INPUT_JSON_FILE_PATH = "/home/dinisrosa22/Documentos/UNI/UC/MIACD/IA CENTRADA NO HUMANO/TRABALHO PROJETO/CODE/database/full/128_fishing_trajs.json"
-    OUTPUT_JSON_FILE_PATH = "/home/dinisrosa22/Documentos/UNI/UC/MIACD/IA CENTRADA NO HUMANO/TRABALHO PROJETO/CODE/database/full/128_fishing_trajs_ordered_by_id.json"
+from constants import INPUT_CSV_FILE_PATH, INPUT_JSON_FILE_PATH, OUTPUT_JSON_FILE_PATH
 
 
 def csv_to_json_file(csv_file_path, json_file_path):
