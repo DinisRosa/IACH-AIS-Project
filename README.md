@@ -1,39 +1,34 @@
 # IACH-AIS-Project
 
-Projeto de Inteligência Artificial Centrada no Humano para análise de
-trajetórias AIS e deteção de atividade de pesca.
+Código para análise de trajetórias AIS e deteção de atividade de pesca no
+âmbito do projeto de Inteligência Artificial Centrada no Humano.
 
 ## Objetivo
 
-O projeto investiga a segmentação semântica de trajetórias AIS em duas
-classes:
+O pipeline trabalha com trajetórias AIS e agrupa os pontos por ID. As classes
+originais são agregadas em:
 
-- **Navegação**: classes originais `01`, `03` e `05`;
-- **Pesca**: classes originais `02` e `04`.
+- **Navegação**: `01`, `03` e `05`;
+- **Pesca**: `02` e `04`.
 
-A proposta científica estuda a utilização de janelas sobrepostas e
-pós-processamento temporal, mantendo a decisão final sob responsabilidade de
-um inspetor humano.
+O código inclui análises exploratórias, comparação de coordenadas e
+visualização de janelas sobrepostas.
 
-## Estado atual
+## Estrutura do repositório
 
-### Implementado
+Esta pasta (`CODE/`) é a raiz do repositório GitHub e contém apenas o código e
+as instruções de utilização:
 
-- Conversão do dataset de CSV para JSON em
-  [`partition_dataset.py`](partition_dataset.py);
-- Agrupamento dos pontos por trajetória/ID;
-- Centralização de caminhos, features, classes e parâmetros em
-  [`constants.py`](constants.py);
-- Análise exploratória e geração de figuras em
-  [`visualizations.py`](visualizations.py);
-- Análises de distribuição de classes, fragmentação, features por classe,
-  outliers, gaps temporais, normalização e janelas sobrepostas;
+```text
+.
+├── constants.py
+├── partition_dataset.py
+├── visualizations.py
+└── README.md
+```
 
-### Ainda planeado
-
-O classificador de janelas, os baselines HMM/Wu et al., o pós-processamento
-temporal, a avaliação quantitativa e o dashboard de apoio à decisão humana
-descritos na proposta ainda não fazem parte do pipeline implementado.
+Os diretórios `database/`, `figures/` e `docs/` são locais e estão incluídos no
+`.gitignore`. Não fazem parte do conteúdo versionado no GitHub.
 
 ## Dados
 
@@ -41,67 +36,97 @@ O dataset utilizado é o
 [Detailed Labelled Fishing Trajectories from AIS](https://www.kaggle.com/datasets/thedevastator/detailed-labelled-fishing-trajectories-from-ais),
 obtido através do Kaggle.
 
-O repositório contém:
-
-- código para processar os datasets locais em `database/`, que não são
-  versionados.
-
-O CSV completo não é obtido automaticamente pelo projeto e pode não estar
-versionado devido ao seu tamanho. Nesse caso, deve ser descarregado a partir
-do Kaggle e colocado em:
+Os caminhos de entrada e saída estão definidos em
+[`constants.py`](constants.py). Por predefinição, `ALL_TRAJS = True` e o
+pipeline espera o dataset completo em:
 
 ```text
 database/full/128_fishing_trajs.csv
 ```
 
-Os caminhos atualmente utilizados pelo pipeline estão definidos em
-[`constants.py`](constants.py). Para trabalhar com a amostra
-parcial, alterar `ALL_TRAJS` para `False`.
+Para usar a amostra parcial, altere `ALL_TRAJS` para `False`. Nesse caso, o
+ficheiro esperado é:
 
-## Como executar
+```text
+database/partial/small_fishing_trajs.csv
+```
 
-A partir da raiz do projeto:
+Os datasets e os ficheiros gerados são locais e não são enviados para o
+GitHub.
+
+## Instalação
+
+As principais dependências Python são:
+
+- `numpy`;
+- `pandas`;
+- `matplotlib`;
+- `seaborn`.
+
+Pode usar o ambiente virtual local `AIS_venv/`, que não é versionado.
+
+## Processamento dos dados
+
+A partir da raiz do repositório:
 
 ```bash
 python3 partition_dataset.py
+```
+
+O script executa três etapas:
+
+1. converte o CSV configurado para JSON;
+2. agrupa os pontos por trajetória/ID;
+3. cria uma segunda versão do JSON sem `longitude` e `latitude`.
+
+O primeiro JSON mantém todas as colunas. O segundo contém as variáveis
+necessárias para trabalhar apenas com `x` e `y`, mantendo também as restantes
+features e labels. Os ficheiros gerados usam estes nomes:
+
+```text
+database/full/128_fishing_trajs_ordered_by_id.json
+database/full/128_fishing_trajs_xy_ordered_by_id.json
+```
+
+Ou, quando `ALL_TRAJS = False`:
+
+```text
+database/partial/small_fishing_trajs_ordered_by_id.json
+database/partial/small_fishing_trajs_xy_ordered_by_id.json
+```
+
+## Visualizações
+
+Execute:
+
+```bash
 python3 visualizations.py
 ```
 
-O primeiro comando converte o CSV configurado para JSON e cria a versão
-agrupada por ID. O segundo carrega o JSON agrupado e gera as figuras na pasta
-`figures/`. O bloco `if __name__ == "__main__":` de
-`visualizations.py` usa diretamente o ID
-`211477000-2`, uma janela de 50 pontos e uma sobreposição de 25 pontos; altere
-esses valores diretamente nas chamadas das funções se necessário.
-Também gera uma imagem com cinco subgráficos através de
-`plot_multiple_trajectories(dataset, 5)`, comparando as trajetórias
-`longitude/latitude` e `x/y` normalizadas para `0–1`.
+As figuras são guardadas localmente em `figures/`. Os parâmetros das
+visualizações são definidos diretamente no bloco
+`if __name__ == "__main__":`, sem parser de linha de comandos.
 
-Ao executar `partition_dataset.py`, além do JSON agrupado original, é
-criado um segundo dataset com apenas as variáveis necessárias para o modelo:
-`x`, `y` e as restantes features, mas sem `longitude` e `latitude`. O ficheiro
-é guardado com o sufixo `_xy_ordered_by_id.json`.
+Atualmente, o script:
 
-As dependências Python principais são `numpy`, `pandas`, `matplotlib` e
-`seaborn`. O ambiente virtual local existente em `AIS_venv/` não faz
-parte do código da aplicação.
+- usa a trajetória `"211477000-2"` no gráfico `speed versus turn`;
+- desenha janelas de 50 pontos com 25 pontos de sobreposição;
+- compara `longitude/latitude` com `x/y` normalizados em cinco subgráficos;
+- gera análises de distribuição, segmentos, features, outliers, gaps
+  temporais e normalização.
 
-## Estrutura principal
+Para alterar a trajetória ou os parâmetros das janelas, edite diretamente as
+chamadas no final de [`visualizations.py`](visualizations.py), por exemplo:
 
-```text
-.
-├── constants.py              # Configuração partilhada
-├── partition_dataset.py      # Conversão e agrupamento dos dados
-├── visualizations.py         # Análise exploratória e figuras
-└── README.md                 # Instruções do código
-
-database/                     # Dados locais, não versionados
-figures/                      # Figuras geradas, não versionadas
+```python
+plot_speed_vs_turn_id(dataset, "211477000-2")
+plot_overlapping_windows(dataset, "211477000-2", 50, 25)
+plot_multiple_trajectories(dataset, 5)
 ```
 
 ## Verificação
 
-Os módulos Python podem ser verificados sem executar o pipeline completo:
+Para verificar a sintaxe sem executar o pipeline completo:
 
 ```bash
 python3 -m compileall -q *.py
