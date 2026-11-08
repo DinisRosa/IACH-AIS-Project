@@ -14,9 +14,8 @@ CODE/AIS_venv/
 .github/
 .abacusai/
 
-# Dados locais maiores que o limite do GitHub
-CODE/database/full/
-CODE/database/partial/*.json
+# Dados locais e derivados (não versionar no GitHub)
+database/
 
 # Notas de planeamento (não versionar)
 docs/

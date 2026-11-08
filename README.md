@@ -13,25 +13,21 @@ classes:
 
 A proposta científica estuda a utilização de janelas sobrepostas e
 pós-processamento temporal, mantendo a decisão final sob responsabilidade de
-um inspetor humano. A proposta completa está em
-[`latex/proposta_pt.tex`](latex/proposta_pt.tex).
+um inspetor humano.
 
 ## Estado atual
 
 ### Implementado
 
 - Conversão do dataset de CSV para JSON em
-  [`CODE/partition_dataset.py`](CODE/partition_dataset.py);
+  [`partition_dataset.py`](partition_dataset.py);
 - Agrupamento dos pontos por trajetória/ID;
 - Centralização de caminhos, features, classes e parâmetros em
-  [`CODE/constants.py`](CODE/constants.py);
+  [`constants.py`](constants.py);
 - Análise exploratória e geração de figuras em
-  [`CODE/visualizations.py`](CODE/visualizations.py);
+  [`visualizations.py`](visualizations.py);
 - Análises de distribuição de classes, fragmentação, features por classe,
   outliers, gaps temporais, normalização e janelas sobrepostas;
-- Figuras resultantes disponíveis em [`figures/`](figures/);
-- Proposta de projeto em português e respetivos PDFs em [`latex/`](latex/);
-- Bibliografia científica reunida em [`bibliografia/`](bibliografia/).
 
 ### Ainda planeado
 
@@ -47,20 +43,19 @@ obtido através do Kaggle.
 
 O repositório contém:
 
-- uma amostra parcial em `CODE/database/partial/`;
-- os ficheiros processados do dataset completo em `CODE/database/full/`,
-  quando disponíveis localmente.
+- código para processar os datasets locais em `database/`, que não são
+  versionados.
 
 O CSV completo não é obtido automaticamente pelo projeto e pode não estar
 versionado devido ao seu tamanho. Nesse caso, deve ser descarregado a partir
 do Kaggle e colocado em:
 
 ```text
-CODE/database/full/128_fishing_trajs.csv
+database/full/128_fishing_trajs.csv
 ```
 
 Os caminhos atualmente utilizados pelo pipeline estão definidos em
-[`CODE/constants.py`](CODE/constants.py). Para trabalhar com a amostra
+[`constants.py`](constants.py). Para trabalhar com a amostra
 parcial, alterar `ALL_TRAJS` para `False`.
 
 ## Como executar
@@ -68,33 +63,40 @@ parcial, alterar `ALL_TRAJS` para `False`.
 A partir da raiz do projeto:
 
 ```bash
-python3 CODE/partition_dataset.py
-python3 CODE/visualizations.py
+python3 partition_dataset.py
+python3 visualizations.py
 ```
 
 O primeiro comando converte o CSV configurado para JSON e cria a versão
 agrupada por ID. O segundo carrega o JSON agrupado e gera as figuras na pasta
-`figures/`.
+`figures/`. O bloco `if __name__ == "__main__":` de
+`visualizations.py` usa diretamente o ID
+`211477000-2`, uma janela de 50 pontos e uma sobreposição de 25 pontos; altere
+esses valores diretamente nas chamadas das funções se necessário.
+Também gera uma imagem com cinco subgráficos através de
+`plot_multiple_trajectories(dataset, 5)`, comparando as trajetórias
+`longitude/latitude` e `x/y` normalizadas para `0–1`.
+
+Ao executar `partition_dataset.py`, além do JSON agrupado original, é
+criado um segundo dataset com apenas as variáveis necessárias para o modelo:
+`x`, `y` e as restantes features, mas sem `longitude` e `latitude`. O ficheiro
+é guardado com o sufixo `_xy_ordered_by_id.json`.
 
 As dependências Python principais são `numpy`, `pandas`, `matplotlib` e
-`seaborn`. O ambiente virtual local existente em `CODE/AIS_venv/` não faz
+`seaborn`. O ambiente virtual local existente em `AIS_venv/` não faz
 parte do código da aplicação.
 
 ## Estrutura principal
 
 ```text
-CODE/
+.
 ├── constants.py              # Configuração partilhada
 ├── partition_dataset.py      # Conversão e agrupamento dos dados
 ├── visualizations.py         # Análise exploratória e figuras
-└── database/
-    ├── full/                 # Dataset completo e derivados locais
-    └── partial/              # Amostra parcial e derivados
+└── README.md                 # Instruções do código
 
-figures/                      # Figuras geradas pelo pipeline
-latex/                        # Proposta e documentos LaTeX
-bibliografia/                 # Artigos e fontes bibliográficas
-docs/                         # Revisões e notas sobre a proposta
+database/                     # Dados locais, não versionados
+figures/                      # Figuras geradas, não versionadas
 ```
 
 ## Verificação
@@ -102,5 +104,5 @@ docs/                         # Revisões e notas sobre a proposta
 Os módulos Python podem ser verificados sem executar o pipeline completo:
 
 ```bash
-python3 -m compileall -q CODE/*.py
+python3 -m compileall -q *.py
 ```

@@ -1,16 +1,18 @@
 # Constantes partilhadas por todo o projecto (caminhos, flags e parâmetros de plot).
 
 # ---------------------------------------------------------------- pipeline
-ALL_TRAJS = True
+ALL_TRAJS = True  # True: usar todas as trajetórias; False: usar apenas uma amostra pequena
 
 if not ALL_TRAJS:
     INPUT_CSV_FILE_PATH = "/home/dinisrosa22/Documentos/UNI/UC/MIACD/IA CENTRADA NO HUMANO/TRABALHO PROJETO/CODE/database/partial/small_fishing_trajs.csv"
     INPUT_JSON_FILE_PATH = "/home/dinisrosa22/Documentos/UNI/UC/MIACD/IA CENTRADA NO HUMANO/TRABALHO PROJETO/CODE/database/partial/small_fishing_trajs.json"
     OUTPUT_JSON_FILE_PATH = "/home/dinisrosa22/Documentos/UNI/UC/MIACD/IA CENTRADA NO HUMANO/TRABALHO PROJETO/CODE/database/partial/small_fishing_trajs_ordered_by_id.json"
+    REDUCED_OUTPUT_JSON_FILE_PATH = "/home/dinisrosa22/Documentos/UNI/UC/MIACD/IA CENTRADA NO HUMANO/TRABALHO PROJETO/CODE/database/partial/small_fishing_trajs_xy_ordered_by_id.json"
 else:
     INPUT_CSV_FILE_PATH = "/home/dinisrosa22/Documentos/UNI/UC/MIACD/IA CENTRADA NO HUMANO/TRABALHO PROJETO/CODE/database/full/128_fishing_trajs.csv"
     INPUT_JSON_FILE_PATH = "/home/dinisrosa22/Documentos/UNI/UC/MIACD/IA CENTRADA NO HUMANO/TRABALHO PROJETO/CODE/database/full/128_fishing_trajs.json"
     OUTPUT_JSON_FILE_PATH = "/home/dinisrosa22/Documentos/UNI/UC/MIACD/IA CENTRADA NO HUMANO/TRABALHO PROJETO/CODE/database/full/128_fishing_trajs_ordered_by_id.json"
+    REDUCED_OUTPUT_JSON_FILE_PATH = "/home/dinisrosa22/Documentos/UNI/UC/MIACD/IA CENTRADA NO HUMANO/TRABALHO PROJETO/CODE/database/full/128_fishing_trajs_xy_ordered_by_id.json"
 
 # ---------------------------------------------------------------- figuras
 FIGURES_DIR = "figures"

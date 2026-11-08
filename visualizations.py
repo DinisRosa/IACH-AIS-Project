@@ -43,6 +43,13 @@ def _use_log_scale(values):
     return np.percentile(values, 99) / median >= 3 or values.max() / median >= 10
 
 
+def _normalize_for_plot(values):
+    values = np.asarray(values, dtype=float)
+    minimum = values.min()
+    span = values.max() - minimum
+    return np.zeros_like(values) if span == 0 else (values - minimum) / span
+
+
 def _collect_features(dataset, features):
     """Concatena as `features` de todas as trajetórias e devolve-as com a máscara de classe."""
     values = {feature: [] for feature in features}
@@ -378,22 +385,25 @@ def plot_normalization_before_after(dataset):
     _save_fig("normalization_before_after.png")
 
 
-def plot_overlapping_windows(dataset):
-    ids = [id_ for id_ in sorted(dataset) if dataset[id_]["total_rows"] >= WINDOW_PLOT_POINTS]
-    if not ids:
-        ids = sorted(dataset, key=lambda id_: dataset[id_]["total_rows"], reverse=True)
+def plot_overlapping_windows(dataset, trajectory_id=None, window_length=WINDOW_LENGTH,
+                             overlap_points=int(WINDOW_LENGTH * WINDOW_OVERLAP)):
+    if window_length <= 0:
+        raise ValueError("window_length tem de ser positivo")
+    if overlap_points < 0 or overlap_points >= window_length:
+        raise ValueError("overlap_points tem de estar entre 0 e window_length - 1")
 
-    speed = np.asarray(dataset[ids[0]]["euc_speed"][:WINDOW_PLOT_POINTS], dtype=float)
+    trajectory_id = sorted(dataset)[0] if trajectory_id is None else trajectory_id
+    speed = np.asarray(dataset[trajectory_id]["euc_speed"][:WINDOW_PLOT_POINTS], dtype=float)
     index = np.arange(speed.size)
 
-    step = max(1, int(round(WINDOW_LENGTH * (1 - WINDOW_OVERLAP))))
-    available = 1 + max(0, (speed.size - WINDOW_LENGTH)) // step
+    step = window_length - overlap_points
+    available = 1 + max(0, (speed.size - window_length)) // step
     count = min(WINDOW_PLOT_COUNT, available)
 
     fig, ax = plt.subplots(figsize=(7, 3.5))
     for number in range(count):
         start = number * step
-        stop = min(start + WINDOW_LENGTH, speed.size)
+        stop = min(start + window_length, speed.size)
         ax.axvspan(start, stop, color=WINDOW_COLORS[number % len(WINDOW_COLORS)],
                    alpha=0.3, label=f"Janela {number + 1} [{start}, {stop})")
 
@@ -401,7 +411,7 @@ def plot_overlapping_windows(dataset):
     ax.set_xlabel("Índice do ponto", fontsize=9)
     ax.set_ylabel("euc_speed", fontsize=9)
     ax.set_title(f"Janelas sobrepostas sobre uma trajetória real "
-                 f"(W = {WINDOW_LENGTH} pontos, {int(WINDOW_OVERLAP * 100)}% de sobreposição)",
+                 f"(W = {window_length} pontos, {overlap_points} pontos de sobreposição)",
                  fontsize=9)
     ax.set_xlim(0, speed.size - 1)
     ax.legend(fontsize=8, loc="upper right", framealpha=0.9)
@@ -412,6 +422,54 @@ def plot_overlapping_windows(dataset):
     _save_fig("overlapping_windows.png")
 
 
+def plot_multiple_trajectories(dataset, number_of_trajectories):
+    if (isinstance(number_of_trajectories, (bool, np.bool_))
+            or not isinstance(number_of_trajectories, (int, np.integer))
+            or number_of_trajectories <= 0):
+        raise ValueError("number_of_trajectories tem de ser um inteiro positivo")
+
+    ids = sorted(dataset)[:number_of_trajectories]
+    if not ids:
+        raise ValueError("dataset não contém trajetórias")
+
+    columns = min(3, len(ids))
+    rows = int(np.ceil(len(ids) / columns))
+    fig, axes = plt.subplots(rows, columns, figsize=(columns * 4.2, rows * 3.8),
+                             squeeze=False, sharex=True, sharey=True)
+    axes = axes.ravel()
+
+    for position, trajectory_id in enumerate(ids):
+        entry = dataset[trajectory_id]
+        longitude = _normalize_for_plot(entry["longitude"])
+        latitude = _normalize_for_plot(entry["latitude"])
+        x = _normalize_for_plot(entry["x"])
+        y = _normalize_for_plot(entry["y"])
+        ax = axes[position]
+
+        ax.plot(longitude, latitude, color=NAV_COLOR, alpha=0.75,
+                linewidth=1.0, label="longitude / latitude")
+        ax.plot(x, y, color=FISH_COLOR, alpha=0.75,
+                linewidth=1.0, label="x / y")
+        ax.set_title(f"Trajetória {trajectory_id}", fontsize=9)
+        ax.set_xlim(0, 1)
+        ax.set_ylim(0, 1)
+        ax.set_aspect("equal", adjustable="box")
+        ax.grid(linestyle=":", alpha=0.5)
+
+        if position % columns == 0:
+            ax.set_ylabel("Valor normalizado", fontsize=8)
+        if position >= (rows - 1) * columns:
+            ax.set_xlabel("Valor normalizado", fontsize=8)
+
+    for ax in axes[len(ids):]:
+        ax.set_visible(False)
+
+    axes[0].legend(fontsize=8, loc="best")
+    fig.suptitle("Comparação normalizada: longitude/latitude vs x/y", fontsize=11)
+    fig.tight_layout()
+    _save_fig("normalized_trajectory_comparison.png")
+
+
 if __name__ == "__main__":
     dataset = load_ordered_dataset(OUTPUT_JSON_FILE_PATH)
     plot_rows_by_id_histogram(dataset)
@@ -420,8 +478,9 @@ if __name__ == "__main__":
     plot_segments_per_id(dataset)
     plot_features_by_class(dataset)
     plot_speed_vs_turn(dataset)
-    plot_speed_vs_turn_id(dataset)
+    plot_speed_vs_turn_id(dataset, "211477000-2")
     plot_outliers(dataset)
     plot_time_gaps(dataset)
     plot_normalization_before_after(dataset)
-    plot_overlapping_windows(dataset)
+    plot_overlapping_windows(dataset, "211477000-2", 50, 25)
+    plot_multiple_trajectories(dataset, 5)
