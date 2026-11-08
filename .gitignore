@@ -6,7 +6,7 @@ build/
 dist/
 
 # Ambientes virtuais
-CODE/AIS_venv/
+AIS_venv/
 
 # IDE / editor / agents
 .vscode/
