@@ -1,4 +1,5 @@
 import os
+import sys
 from collections import Counter
 
 import numpy as np
@@ -6,13 +7,22 @@ import pandas as pd
 import seaborn as sns
 from matplotlib import pyplot as plt
 from matplotlib.ticker import FuncFormatter
+
+# Torna importáveis o `constants.py` (CODE/) e o `tests_datasets.py` (esta pasta)
+# quando o script corre diretamente, a partir de qualquer diretório.
+_FEATURES_ENG_DIR = os.path.dirname(os.path.abspath(__file__))
+_CODE_DIR = os.path.dirname(_FEATURES_ENG_DIR)
+for _path in (_CODE_DIR, _FEATURES_ENG_DIR):
+    if _path not in sys.path:
+        sys.path.insert(0, _path)
+
 from constants import (BINARY_CLASSES, CLASS_COLORS, FISHING_LABELS, FIGURES_DIR,
                        FEATURES, LOG_FEATURES, NAV_COLOR, ORIG_CLASS_COLORS,
                        OUTPUT_JSON_FILE_PATH, FISH_COLOR, OUTLIER_COLOR,
                        RANDOM_SEED, SAMPLE_SIZE, TIME_GAP_THRESHOLD,
                        WINDOW_COLORS, WINDOW_LENGTH, WINDOW_OVERLAP,
                        WINDOW_PLOT_COUNT, WINDOW_PLOT_POINTS)
-from partition_dataset import load_ordered_dataset
+from tests_datasets import load_ordered_dataset
 
 METERS_PER_SECOND_PER_KNOT = 0.514444444
 
@@ -95,7 +105,7 @@ def _horizontal_bars(labels, values, colors, total, filename, title, figsize,
         ax.spines[spine].set_visible(False)
 
     fig.tight_layout()
-    _save_fig(filename, "estatisticas")
+    _save_fig(filename, "0_features_eng/estatisticas")
 
 
 def plot_rows_by_id_histogram(dataset):
@@ -109,7 +119,7 @@ def plot_rows_by_id_histogram(dataset):
     plt.title("Número de rows por ID")
     plt.xticks(rotation=90)
     plt.tight_layout()
-    _save_fig("rows_by_id.png", "estatisticas")
+    _save_fig("rows_by_id.png", "0_features_eng/estatisticas")
 
 
 def plot_class_distribution(dataset):
@@ -166,7 +176,7 @@ def plot_segments_per_traj(dataset):
     ax.legend(fontsize=8)
 
     fig.tight_layout()
-    _save_fig("segments_per_traj.png", "estatisticas")
+    _save_fig("segments_per_traj.png", "0_features_eng/estatisticas")
 
 
 def plot_segments_per_id(dataset):
@@ -192,7 +202,7 @@ def plot_segments_per_id(dataset):
     ax.legend(fontsize=8)
 
     fig.tight_layout()
-    _save_fig("segments_per_id.png", "estatisticas")
+    _save_fig("segments_per_id.png", "0_features_eng/estatisticas")
 
 
 def plot_features_by_class(dataset):
@@ -233,7 +243,7 @@ def plot_features_by_class(dataset):
         fig.suptitle("Distribuição das features por classe binária (outliers omitidos)",
                      fontsize=10)
         fig.tight_layout(rect=(0, 0, 1, 0.9))
-        _save_fig(f"features_by_class_{number}.png", "estatisticas")
+        _save_fig(f"features_by_class_{number}.png", "0_features_eng/estatisticas")
 
 
 def plot_speed_vs_turn(dataset):
@@ -264,7 +274,7 @@ def plot_speed_vs_turn(dataset):
     ax.legend(fontsize=8, markerscale=2)
 
     fig.tight_layout()
-    _save_fig("speed_vs_turn.png", "velocidade")
+    _save_fig("speed_vs_turn.png", "0_features_eng/velocidade")
 
 
 def plot_speed_vs_turn_id(dataset, id=None):
@@ -290,7 +300,7 @@ def plot_speed_vs_turn_id(dataset, id=None):
     ax.legend(fontsize=8, markerscale=2)
 
     fig.tight_layout()
-    _save_fig("speed_vs_turn_id.png", "velocidade")
+    _save_fig("speed_vs_turn_id.png", "0_features_eng/velocidade")
 
 
 def plot_outliers(dataset):
@@ -334,7 +344,7 @@ def plot_time_gaps(dataset):
     ax.set_axisbelow(True)
 
     fig.tight_layout()
-    _save_fig("time_gaps_histogram.png", "estatisticas")
+    _save_fig("time_gaps_histogram.png", "0_features_eng/estatisticas")
 
     ids = sorted(dataset)
     maxima = np.array([max(dataset[id_]["time_gap"]) for id_ in ids], dtype=float)
@@ -356,7 +366,7 @@ def plot_time_gaps(dataset):
     ax.legend(fontsize=8)
 
     fig.tight_layout()
-    _save_fig("time_gaps_per_id.png", "estatisticas")
+    _save_fig("time_gaps_per_id.png", "0_features_eng/estatisticas")
 
 
 def plot_normalization_before_after(dataset):
@@ -385,7 +395,7 @@ def plot_normalization_before_after(dataset):
     axes[0][1].set_title("Depois (normalização z-score)", fontsize=10)
     fig.suptitle("Normalização z-score de 3 features representativas", fontsize=11)
     fig.tight_layout(rect=(0, 0, 1, 0.96))
-    _save_fig("normalization_before_after.png", "normalizacao")
+    _save_fig("normalization_before_after.png", "0_features_eng/normalizacao")
 
 
 def plot_overlapping_windows(dataset, trajectory_id=None, window_length=WINDOW_LENGTH,
@@ -422,7 +432,7 @@ def plot_overlapping_windows(dataset, trajectory_id=None, window_length=WINDOW_L
     ax.set_axisbelow(True)
 
     fig.tight_layout()
-    _save_fig("overlapping_windows.png", "sobreposicao")
+    _save_fig("overlapping_windows.png", "0_features_eng/sobreposicao")
 
 
 def plot_multiple_trajectories(dataset, number_of_trajectories):
@@ -470,7 +480,7 @@ def plot_multiple_trajectories(dataset, number_of_trajectories):
     axes[0].legend(fontsize=8, loc="upper left")
     fig.suptitle("Comparação normalizada: longitude/latitude vs x/y", fontsize=11)
     fig.tight_layout()
-    _save_fig("normalized_trajectory_comparison.png", "comparacao_features")
+    _save_fig("normalized_trajectory_comparison.png", "0_features_eng/comparacao_features")
 
 
 def _reconstruction_statistics(stored, calculated, tolerance=1e-6):
@@ -564,7 +574,7 @@ def plot_speed_reconstruction_original(dataset):
         "speed_vs_distance_over_time_original.png",
         "Validação sem conversão de unidades",
         "Original: distance_gap / time_gap (m/s)",
-        "comparacao_features",
+        "0_features_eng/comparacao_features",
     )
 
 
@@ -578,7 +588,7 @@ def plot_speed_reconstruction(dataset):
         "speed_vs_distance_over_time.png",
         "Validação de euc_speed por distance_gap / time_gap (nós)",
         "Convertido para nós: distance_gap / time_gap",
-        "comparacao_features",
+        "0_features_eng/comparacao_features",
     )
 
 
@@ -606,7 +616,7 @@ def plot_distance_gap_reconstruction(dataset):
         "distance_gap_vs_xy_distance.png",
         "Validação de distance_gap pela distância consecutiva em x/y",
         "Distância calculada em x/y",
-        "comparacao_features",
+        "0_features_eng/comparacao_features",
     )
 
 

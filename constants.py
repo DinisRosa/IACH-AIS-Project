@@ -9,12 +9,22 @@ if not ALL_TRAJS:
     INPUT_CSV_FILE_PATH = "/home/dinisrosa22/Documentos/UNI/UC/MIACD/IA CENTRADA NO HUMANO/TRABALHO PROJETO/CODE/database/partial/small_fishing_trajs.csv"
     INPUT_JSON_FILE_PATH = "/home/dinisrosa22/Documentos/UNI/UC/MIACD/IA CENTRADA NO HUMANO/TRABALHO PROJETO/CODE/database/partial/small_fishing_trajs.json"
     OUTPUT_JSON_FILE_PATH = "/home/dinisrosa22/Documentos/UNI/UC/MIACD/IA CENTRADA NO HUMANO/TRABALHO PROJETO/CODE/database/partial/small_fishing_trajs_ordered_by_id.json"
-    REDUCED_OUTPUT_JSON_FILE_PATH = "/home/dinisrosa22/Documentos/UNI/UC/MIACD/IA CENTRADA NO HUMANO/TRABALHO PROJETO/CODE/database/partial/small_fishing_trajs_xy_ordered_by_id.json"
+    REDUCED_OUTPUT_JSON_FILE_PATH = "/home/dinisrosa22/Documentos/UNI/UC/MIACD/IA CENTRADA NO HUMANO/TRABALHO PROJETO/CODE/database/partial/small_fishing_trajs_wo_redundant_features.json"
 else:
     INPUT_CSV_FILE_PATH = "/home/dinisrosa22/Documentos/UNI/UC/MIACD/IA CENTRADA NO HUMANO/TRABALHO PROJETO/CODE/database/full/128_fishing_trajs.csv"
     INPUT_JSON_FILE_PATH = "/home/dinisrosa22/Documentos/UNI/UC/MIACD/IA CENTRADA NO HUMANO/TRABALHO PROJETO/CODE/database/full/128_fishing_trajs.json"
     OUTPUT_JSON_FILE_PATH = "/home/dinisrosa22/Documentos/UNI/UC/MIACD/IA CENTRADA NO HUMANO/TRABALHO PROJETO/CODE/database/full/128_fishing_trajs_ordered_by_id.json"
-    REDUCED_OUTPUT_JSON_FILE_PATH = "/home/dinisrosa22/Documentos/UNI/UC/MIACD/IA CENTRADA NO HUMANO/TRABALHO PROJETO/CODE/database/full/128_fishing_trajs_xy_ordered_by_id.json"
+    REDUCED_OUTPUT_JSON_FILE_PATH = "/home/dinisrosa22/Documentos/UNI/UC/MIACD/IA CENTRADA NO HUMANO/TRABALHO PROJETO/CODE/database/full/128_fishing_trajs_wo_redundant_features.json"
+
+# ---------------------------------------------------------------- splits
+# Pastas de destino de cada split (dentro de CODE/), independentes do ALL_TRAJS.
+CODE_DIR = os.path.dirname(os.path.abspath(__file__))
+TRAINING_DIR = os.path.join(CODE_DIR, "1_training")
+TESTING_DIR = os.path.join(CODE_DIR, "2_testing")
+VALIDATION_DIR = os.path.join(CODE_DIR, "3_validation")
+TRAIN_JSON_FILE_PATH = os.path.join(TRAINING_DIR, "train.json")
+TEST_JSON_FILE_PATH = os.path.join(TESTING_DIR, "test.json")
+VALIDATION_JSON_FILE_PATH = os.path.join(VALIDATION_DIR, "validation.json")
 
 # ---------------------------------------------------------------- figuras
 # Raiz do projecto (pasta acima de CODE/), independente do diretório de execução.

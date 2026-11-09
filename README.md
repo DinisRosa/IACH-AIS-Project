@@ -22,9 +22,15 @@ as instruções de utilização:
 ```text
 .
 ├── constants.py
-├── partition_dataset.py
-├── visualizations.py
+├── 0_features_eng/
+│   ├── divide_dataset.py
+│   ├── tests_datasets.py
+│   └── visualizations_pre_training.py
 └── README.md
+```
+
+Os splits gerados ficam em `1_training/`, `2_testing/` e `3_validation/`, que
+são locais e não versionados.
 ```
 
 Os diretórios `database/`, `figures/` e `docs/` são locais e estão incluídos no
@@ -70,14 +76,15 @@ Pode usar o ambiente virtual local `AIS_venv/`, que não é versionado.
 A partir da raiz do repositório:
 
 ```bash
-python3 partition_dataset.py
+python3 CODE/0_features_eng/tests_datasets.py
 ```
 
 O script executa três etapas:
 
 1. converte o CSV configurado para JSON;
 2. agrupa os pontos por trajetória/ID;
-3. cria uma segunda versão do JSON sem `longitude` e `latitude`.
+3. cria uma segunda versão do JSON sem as colunas redundantes
+   (`longitude`, `latitude`, `t`, `bearing`, `distance_gap`).
 
 O primeiro JSON mantém todas as colunas. O segundo contém as variáveis
 necessárias para trabalhar apenas com `x` e `y`, mantendo também as restantes
@@ -85,34 +92,61 @@ features e labels. Os ficheiros gerados usam estes nomes:
 
 ```text
 database/full/128_fishing_trajs_ordered_by_id.json
-database/full/128_fishing_trajs_xy_ordered_by_id.json
+database/full/128_fishing_trajs_wo_redundant_features.json
 ```
 
 Ou, quando `ALL_TRAJS = False`:
 
 ```text
 database/partial/small_fishing_trajs_ordered_by_id.json
-database/partial/small_fishing_trajs_xy_ordered_by_id.json
+database/partial/small_fishing_trajs_wo_redundant_features.json
 ```
+
+## Divisão em treino, teste e validação
+
+```bash
+python3 CODE/0_features_eng/divide_dataset.py
+```
+
+`divide_dataset(dataset_path, train_percentage, test_percentage,
+validation_percentage, seed=RANDOM_SEED)` divide o dataset **por ID**: cada
+trajetória vai inteira para um único split, nunca é partida por pontos. As
+percentagens têm de ser inteiros, pelo menos 1 e somar 100; a contagem de IDs
+segue o método do maior resto, para a soma ser sempre o total de IDs. A
+repartição é reprodutível para a mesma `seed`.
+
+Os ficheiros gerados são locais e não são versionados:
+
+```text
+1_training/train.json
+2_testing/test.json
+3_validation/validation.json
+```
+
+A função devolve os três caminhos por ordem (treino, teste, validação).
 
 ## Visualizações
 
-Execute:
+Execute, a partir de qualquer diretório:
 
 ```bash
-python3 visualizations.py
+python3 CODE/0_features_eng/visualizations_pre_training.py
 ```
 
+O script acrescenta `CODE/` e `CODE/0_features_eng/` ao `sys.path`, pelo que não
+é necessário definir `PYTHONPATH` nem correr a partir de uma pasta específica.
+
 As figuras são guardadas localmente em subpastas de `figures/`, na raiz do
-projecto (pasta acima de `CODE/`), organizadas por finalidade:
+projecto (pasta acima de `CODE/`), organizadas por fase e finalidade:
 
 ```text
 figures/
-├── comparacao_features/
-├── estatisticas/
-├── sobreposicao/
-├── velocidade/
-└── normalizacao/
+└── 0_features_eng/
+    ├── comparacao_features/
+    ├── estatisticas/
+    ├── sobreposicao/
+    ├── velocidade/
+    └── normalizacao/
 ```
 
 Os parâmetros das
@@ -128,7 +162,9 @@ Atualmente, o script:
   temporais e normalização.
 
 Para alterar a trajetória ou os parâmetros das janelas, edite diretamente as
-chamadas no final de [`visualizations.py`](visualizations.py), por exemplo:
+chamadas no final de
+[`visualizations_pre_training.py`](0_features_eng/visualizations_pre_training.py),
+por exemplo:
 
 ```python
 plot_speed_vs_turn_id(dataset, "211477000-2")
@@ -141,5 +177,5 @@ plot_multiple_trajectories(dataset, 5)
 Para verificar a sintaxe sem executar o pipeline completo:
 
 ```bash
-python3 -m compileall -q *.py
+python3 -m compileall -q constants.py 0_features_eng/*.py
 ```

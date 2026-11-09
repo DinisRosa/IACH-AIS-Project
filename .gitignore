@@ -20,3 +20,8 @@ database/
 # Notas de planeamento (não versionar)
 docs/
 figures/
+
+# Splits derivados (não versionar)
+1_training/
+2_testing/
+3_validation/

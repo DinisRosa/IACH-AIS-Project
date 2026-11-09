@@ -1,4 +1,9 @@
 import csv, json
+import os
+import sys
+
+# Torna importável o `constants.py` de CODE/ quando o script corre diretamente.
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from constants import (INPUT_CSV_FILE_PATH, INPUT_JSON_FILE_PATH,
                        OUTPUT_JSON_FILE_PATH, REDUCED_OUTPUT_JSON_FILE_PATH)
@@ -61,15 +66,22 @@ def load_ordered_dataset(json_file_path):
     return ordered_dataset
 
 
-def remove_longitude_latitude_and_t(input_json_file_path, output_json_file_path):
+def remove_redundant_features(input_json_file_path, output_json_file_path):
     with open(input_json_file_path, mode='r', encoding='utf-8') as json_file:
         dataset = json.load(json_file)
+
+    # Lista completa de colunas redundantes ou desnecessárias a remover:
+    # - longitude, latitude: substituídas por x, y
+    # - t: substituída pelo time_gap
+    # - bearing: redundante face ao signed_turn
+    # - distance_gap: redundante face a euc_speed e time_gap (opcional, mas recomendado)
+    columns_to_remove = {"longitude", "latitude", "t", "bearing", "distance_gap"}
 
     reduced_dataset = {}
     for trajectory_id, entry in dataset.items():
         reduced_dataset[trajectory_id] = {
             key: value for key, value in entry.items()
-            if key not in {"longitude", "latitude", "t"}
+            if key not in columns_to_remove
         }
 
     with open(output_json_file_path, mode='w', encoding='utf-8') as json_file:
@@ -83,4 +95,4 @@ def remove_longitude_latitude_and_t(input_json_file_path, output_json_file_path)
 if __name__ == "__main__":
     csv_to_json_file(INPUT_CSV_FILE_PATH, INPUT_JSON_FILE_PATH)
     dados_por_id(INPUT_JSON_FILE_PATH)
-    remove_longitude_latitude_and_t(OUTPUT_JSON_FILE_PATH, REDUCED_OUTPUT_JSON_FILE_PATH)
+    remove_redundant_features(OUTPUT_JSON_FILE_PATH, REDUCED_OUTPUT_JSON_FILE_PATH)
