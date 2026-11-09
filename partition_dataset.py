@@ -61,7 +61,7 @@ def load_ordered_dataset(json_file_path):
     return ordered_dataset
 
 
-def remove_longitude_latitude(input_json_file_path, output_json_file_path):
+def remove_longitude_latitude_and_t(input_json_file_path, output_json_file_path):
     with open(input_json_file_path, mode='r', encoding='utf-8') as json_file:
         dataset = json.load(json_file)
 
@@ -69,7 +69,7 @@ def remove_longitude_latitude(input_json_file_path, output_json_file_path):
     for trajectory_id, entry in dataset.items():
         reduced_dataset[trajectory_id] = {
             key: value for key, value in entry.items()
-            if key not in {"longitude", "latitude"}
+            if key not in {"longitude", "latitude", "t"}
         }
 
     with open(output_json_file_path, mode='w', encoding='utf-8') as json_file:
@@ -83,4 +83,4 @@ def remove_longitude_latitude(input_json_file_path, output_json_file_path):
 if __name__ == "__main__":
     csv_to_json_file(INPUT_CSV_FILE_PATH, INPUT_JSON_FILE_PATH)
     dados_por_id(INPUT_JSON_FILE_PATH)
-    remove_longitude_latitude(OUTPUT_JSON_FILE_PATH, REDUCED_OUTPUT_JSON_FILE_PATH)
+    remove_longitude_latitude_and_t(OUTPUT_JSON_FILE_PATH, REDUCED_OUTPUT_JSON_FILE_PATH)

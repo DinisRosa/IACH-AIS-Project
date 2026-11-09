@@ -103,7 +103,19 @@ Execute:
 python3 visualizations.py
 ```
 
-As figuras são guardadas localmente em `figures/`. Os parâmetros das
+As figuras são guardadas localmente em subpastas de `figures/`, organizadas por
+finalidade:
+
+```text
+figures/
+├── comparacao_features/
+├── estatisticas/
+├── sobreposicao/
+├── velocidade/
+└── normalizacao/
+```
+
+Os parâmetros das
 visualizações são definidos diretamente no bloco
 `if __name__ == "__main__":`, sem parser de linha de comandos.
 
