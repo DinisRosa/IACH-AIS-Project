@@ -1,5 +1,7 @@
 # Constantes partilhadas por todo o projecto (caminhos, flags e parâmetros de plot).
 
+import os
+
 # ---------------------------------------------------------------- pipeline
 ALL_TRAJS = True  # True: usar todas as trajetórias; False: usar apenas uma amostra pequena
 
@@ -15,7 +17,9 @@ else:
     REDUCED_OUTPUT_JSON_FILE_PATH = "/home/dinisrosa22/Documentos/UNI/UC/MIACD/IA CENTRADA NO HUMANO/TRABALHO PROJETO/CODE/database/full/128_fishing_trajs_xy_ordered_by_id.json"
 
 # ---------------------------------------------------------------- figuras
-FIGURES_DIR = "figures"
+# Raiz do projecto (pasta acima de CODE/), independente do diretório de execução.
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+FIGURES_DIR = os.path.join(PROJECT_ROOT, "figures")
 
 # ---------------------------------------------------------------- dados
 FEATURES = ["euc_speed", "signed_turn", "bearing", "time_gap", "distance_gap", "distanceToShore"]

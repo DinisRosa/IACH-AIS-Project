@@ -103,8 +103,8 @@ Execute:
 python3 visualizations.py
 ```
 
-As figuras são guardadas localmente em subpastas de `figures/`, organizadas por
-finalidade:
+As figuras são guardadas localmente em subpastas de `figures/`, na raiz do
+projecto (pasta acima de `CODE/`), organizadas por finalidade:
 
 ```text
 figures/
