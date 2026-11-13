@@ -109,8 +109,10 @@ python3 CODE/0_features_eng/divide_dataset.py
 ```
 
 `divide_dataset(dataset_path, train_percentage, test_percentage,
-validation_percentage, seed=RANDOM_SEED)` divide o dataset **por ID**: cada
-trajetória vai inteira para um único split, nunca é partida por pontos. As
+validation_percentage, seed=RANDOM_SEED)` divide o dataset **por ID completo**:
+cada trajetória vai inteira para um único split, nunca é partida por pontos.
+Neste projeto, cada ID completo é uma unidade independente; IDs com o mesmo
+prefixo não são agrupados. A execução direta do script gera 70/15/15. As
 percentagens têm de ser inteiros, pelo menos 1 e somar 100; a contagem de IDs
 segue o método do maior resto, para a soma ser sempre o total de IDs. A
 repartição é reprodutível para a mesma `seed`.

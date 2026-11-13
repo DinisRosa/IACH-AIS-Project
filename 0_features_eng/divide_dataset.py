@@ -51,11 +51,12 @@ def _write_split(dataset, ids, output_path):
 
 def divide_dataset(dataset_path, train_percentage, test_percentage,
                    validation_percentage, seed=RANDOM_SEED):
-    """Divide o dataset por ID em train/test/validation e grava um JSON por split.
+    """Divide o dataset por ID completo em train/test/validation e grava um JSON por split.
 
-    A divisão é feita por trajetória (ID), nunca por número de pontos, pelo que
-    cada ID aparece inteiro num único split. Devolve os três caminhos gerados,
-    por ordem (train, test, validation).
+    A divisão é feita pela chave integral de cada trajetória, nunca por número
+    de pontos, pelo que cada ID completo aparece inteiro num único split. Um
+    prefixo comum entre IDs não é usado para os agrupar. Devolve os três
+    caminhos gerados, por ordem (train, test, validation).
     """
     percentages = (train_percentage, test_percentage, validation_percentage)
     _validate_percentages(percentages)
@@ -80,4 +81,4 @@ def divide_dataset(dataset_path, train_percentage, test_percentage,
 
 
 if __name__ == "__main__":
-    divide_dataset(OUTPUT_JSON_FILE_PATH, 70, 20, 10)
+    divide_dataset(OUTPUT_JSON_FILE_PATH, 70, 15, 15)
