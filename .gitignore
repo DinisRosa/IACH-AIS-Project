@@ -1,0 +1,33 @@
+# Local agent, editor, and migration state
+/.agents/
+/.aws/
+/.codex/
+/.superpowers/
+/.vscode/
+/.migration/
+
+# Python caches and test artifacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.egg-info/
+
+# Local environment and datasets
+/CODE/AIS_venv/
+/CODE/database/
+/CODE/1_training/
+/CODE/2_testing/
+/CODE/3_validation/
+
+# Generated figures are committed only on the feature-engineering branch
+/CODE/figures/
+/figures/
+
+# LaTeX build products and temporary logs
+/latex/build/
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+texput.log
