@@ -19,9 +19,8 @@ __pycache__/
 /CODE/2_testing/
 /CODE/3_validation/
 
-# Generated figures are committed only on the feature-engineering branch
+# Legacy output path from the old CODE-root repository
 /CODE/figures/
-/figures/
 
 # LaTeX build products and temporary logs
 /latex/build/
