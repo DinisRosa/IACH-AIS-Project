@@ -16,8 +16,8 @@ visualização de janelas sobrepostas.
 
 ## Estrutura do repositório
 
-Esta pasta (`CODE/`) é a raiz do repositório GitHub e contém apenas o código e
-as instruções de utilização:
+Esta pasta contém o código Python dentro do repositório do projeto. O mapa da
+proposta, bibliografia e branches está no [`README.md`](../README.md) da raiz.
 
 ```text
 .
@@ -31,11 +31,12 @@ as instruções de utilização:
 ```
 
 Os splits gerados ficam em `1_training/`, `2_testing/` e `3_validation/`, que
-são locais e não versionados.
-```
-
-Os diretórios `database/`, `figures/` e `docs/` são locais e estão incluídos no
-`.gitignore`. Não fazem parte do conteúdo versionado no GitHub.
+são locais e não versionados. Os CSVs e datasets em `database/` também são
+locais. As figuras são guardadas em `../figures/` e versionadas na branch da
+fase que as produziu. Os JSONs gerados na fase de feature engineering estão
+arquivados em
+[`phase_artifacts/features_engineering/`](phase_artifacts/features_engineering/README.md)
+na branch `features_engineering`.
 
 ## Dados
 
@@ -167,8 +168,9 @@ python3 CODE/0_features_eng/visualizations_pre_training.py
 O script acrescenta `CODE/` e `CODE/0_features_eng/` ao `sys.path`, pelo que não
 é necessário definir `PYTHONPATH` nem correr a partir de uma pasta específica.
 
-As figuras são guardadas localmente em subpastas de `figures/`, na raiz do
-projecto (pasta acima de `CODE/`), organizadas por fase e finalidade:
+As figuras são guardadas em subpastas de `figures/`, na raiz do projeto (pasta
+acima de `CODE/`), organizadas por fase e finalidade. Versiona-as apenas na
+branch correspondente à fase:
 
 ```text
 figures/

@@ -103,7 +103,7 @@ Create `AGENTS.md` with the project map, source-vs-generated data rules, phase-b
 
 - [ ] **Step 3: Add root ignore rules**
 
-Ignore local editor/agent state, `.superpowers/`, `CODE/AIS_venv/`, `CODE/database/`, `CODE/1_training/`, `CODE/2_testing/`, `CODE/3_validation/`, Python caches, pytest caches, `CODE/figures/`, LaTeX build directories/intermediates, `.migration/`, and temporary logs. Do not ignore root `docs/`, source PDFs, BibTeX, or `.tex` sources.
+Ignore local editor/agent state, `.superpowers/`, `CODE/AIS_venv/`, `CODE/database/`, `CODE/1_training/`, `CODE/2_testing/`, `CODE/3_validation/`, Python caches, pytest caches, legacy `CODE/figures/`, LaTeX build directories/intermediates, `.migration/`, and temporary logs. Keep project-root `figures/` trackable on its producing phase branch. Do not ignore root `docs/`, source PDFs, BibTeX, or `.tex` sources.
 
 - [ ] **Step 4: Confirm source and output boundaries**
 
@@ -157,7 +157,7 @@ Expected: local `main` and `features_engineering` exist and the original commits
 **Files:**
 - Create: `CODE/phase_artifacts/features_engineering/README.md`
 - Create: `CODE/phase_artifacts/features_engineering/datasets.tar.gz.part-*`
-- Preserve existing tracked images: `CODE/figures/0_features_eng/`
+- Move the existing feature-engineering images to: `figures/0_features_eng/`
 - Modify: `CODE/.gitignore` only if needed for the new root layout.
 
 **Interfaces:**
@@ -170,13 +170,13 @@ Write the exact ordered part names, original file paths, and a shell command tha
 
 - [ ] **Step 2: Commit the feature-phase record**
 
-Commit the archive parts and README on `features_engineering`. Keep the existing generated images tracked on that branch. Apply the saved patch from Task 1 and commit the three pending deletions as an explicit cleanup commit, retaining their earlier versions in prior history.
+Commit the archive parts and README on `features_engineering`. Move the existing images from `CODE/figures/0_features_eng/` to the project-root `figures/0_features_eng/` used by `CODE/constants.py`, and keep them tracked on that branch. Apply the saved patch from Task 1 and commit the three pending deletions as an explicit cleanup commit, retaining their earlier versions in prior history.
 
 ### Task 6: Create the clean next-phase branch
 
 **Files:**
 - Create branch: `model_training`
-- Remove from this branch: `CODE/figures/0_features_eng/`
+- Remove from this branch: `figures/0_features_eng/`
 - Remove from this branch: `CODE/phase_artifacts/features_engineering/`
 - Preserve locally: both source CSVs and `CODE/AIS_venv/`.
 

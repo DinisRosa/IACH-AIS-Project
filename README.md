@@ -11,6 +11,8 @@ for the Human-Centred Artificial Intelligence course.
 - `bibliografia/` — research papers used by the project.
 - `latex/` — proposal sources, bibliography, and final proposal PDF.
 - `FormattingGuidelines-IJCAI-ECAI-26/` — conference LaTeX style files.
+- `figures/` — generated visualizations, committed on the phase branch that
+  produced them.
 
 ## Phase branches
 
