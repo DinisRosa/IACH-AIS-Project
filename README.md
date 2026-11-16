@@ -24,6 +24,7 @@ as instruções de utilização:
 ├── constants.py
 ├── 0_features_eng/
 │   ├── divide_dataset.py
+│   ├── csv_to_dataset.py
 │   ├── tests_datasets.py
 │   └── visualizations_pre_training.py
 └── README.md
@@ -73,42 +74,70 @@ Pode usar o ambiente virtual local `AIS_venv/`, que não é versionado.
 
 ## Processamento dos dados
 
-A partir da raiz do repositório:
-
-```bash
-python3 CODE/0_features_eng/tests_datasets.py
-```
-
-O script executa três etapas:
-
-1. converte o CSV configurado para JSON;
-2. agrupa os pontos por trajetória/ID;
-3. cria uma segunda versão do JSON sem as colunas redundantes
-   (`longitude`, `latitude`, `t`, `bearing`, `distance_gap`).
-
-O primeiro JSON mantém todas as colunas. O segundo contém as variáveis
-necessárias para trabalhar apenas com `x` e `y`, mantendo também as restantes
-features e labels. Os ficheiros gerados usam estes nomes:
+O processamento segue esta ordem:
 
 ```text
-database/full/128_fishing_trajs_ordered_by_id.json
-database/full/128_fishing_trajs_wo_redundant_features.json
+CSV validado -> JSON final agrupado por ID -> train/test/validation
 ```
 
-Ou, quando `ALL_TRAJS = False`:
+### 1. Converter e validar o CSV
 
-```text
-database/partial/small_fishing_trajs_ordered_by_id.json
-database/partial/small_fishing_trajs_wo_redundant_features.json
-```
+`0_features_eng/csv_to_dataset.py` lê o CSV configurado, valida todas as
+linhas e só cria o JSON depois de o dataset completo passar as validações.
+O JSON final é indexado pelo ID e mantém, para cada trajetória, apenas:
 
-## Divisão em treino, teste e validação
+- `id`;
+- `x`;
+- `y`;
+- `signed_turn`;
+- `time_gap`;
+- `euc_speed`;
+- `distanceToShore`;
+- `label`;
+
+O `label` de origem é convertido para o label binário usado pelo pipeline:
+`02-fishing` e `04-fishing` tornam-se `1`; `01-sailing`, `03-sailing` e
+`05-sailing` tornam-se `0`. As colunas `longitude`, `latitude`, `t`, `bearing`
+e `distance_gap` não são copiadas. A conversão pode ser executada a partir da
+raiz de `CODE` com:
 
 ```bash
-python3 CODE/0_features_eng/divide_dataset.py
+AIS_venv/bin/python -c \
+  "from constants import INPUT_CSV_FILE_PATH, OUTPUT_JSON_FILE_PATH; \
+from importlib.util import spec_from_file_location, module_from_spec; \
+spec = spec_from_file_location('csv_to_dataset', '0_features_eng/csv_to_dataset.py'); \
+module = module_from_spec(spec); spec.loader.exec_module(module); \
+print(module.convert_csv_to_json(INPUT_CSV_FILE_PATH, OUTPUT_JSON_FILE_PATH))"
 ```
 
-`divide_dataset(dataset_path, train_percentage, test_percentage,
+O caminho de entrada e o caminho do JSON final dependem de `ALL_TRAJS` em
+`constants.py`:
+
+```text
+ALL_TRAJS = True:
+  database/full/128_fishing_trajs.csv
+  database/full/128_fishing_trajs_ordered_by_id.json
+
+ALL_TRAJS = False:
+  database/partial/small_fishing_trajs.csv
+  database/partial/small_fishing_trajs_ordered_by_id.json
+```
+
+Se uma coluna obrigatória estiver ausente, se houver um ID vazio, um label de
+origem fora das cinco classes conhecidas, ou um valor não numérico, a
+conversão falha e não escreve um JSON parcial. Valores `NaN` e `inf` também
+são erros explícitos: a mensagem inclui o ficheiro, a linha física do CSV
+(com o cabeçalho como linha 1), o ID, a coluna e o valor inválido.
+
+### 2. Dividir o JSON final em treino, teste e validação
+
+```bash
+AIS_venv/bin/python 0_features_eng/divide_dataset.py
+```
+
+Executar o comando a partir da raiz de `CODE` usa o JSON final configurado e
+gera os três splits. A função `divide_dataset(dataset_path, train_percentage,
+test_percentage,
 validation_percentage, seed=RANDOM_SEED)` divide o dataset **por ID completo**:
 cada trajetória vai inteira para um único split, nunca é partida por pontos.
 Neste projeto, cada ID completo é uma unidade independente; IDs com o mesmo
