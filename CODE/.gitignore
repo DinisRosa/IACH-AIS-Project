@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+
+# Ambientes virtuais
+AIS_venv/
+
+# IDE / editor / agents
+.vscode/
+.opencode
+.github/
+.abacusai/
+
+# Dados locais e derivados (não versionar no GitHub)
+database/
+
+# Notas de planeamento (não versionar)
+docs/
+figures/
+
+# Splits derivados (não versionar)
+1_training/
+2_testing/
+3_validation/
