@@ -6,11 +6,17 @@ import json
 import math
 import os
 import csv
+import sys
 import tempfile
 from pathlib import Path
 from typing import Final
 
 import pandas as pd
+
+# Torna importável o `constants.py` de CODE/ quando o script corre diretamente.
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from constants import INPUT_CSV_FILE_PATH, OUTPUT_JSON_FILE_PATH
 
 
 FEATURE_COLUMNS: Final[tuple[str, ...]] = (
@@ -168,3 +174,7 @@ def convert_csv_to_json(
         if temporary.exists():
             temporary.unlink()
     return destination
+
+
+if __name__ == "__main__":
+    convert_csv_to_json(INPUT_CSV_FILE_PATH, OUTPUT_JSON_FILE_PATH)
